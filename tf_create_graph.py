@@ -29,5 +29,9 @@ with tf.Session(graph=g2) as sess:
         print sess.run(tf.get_variable("v"))
 
 
-
+# tf中的集合列表
 print(tf.GraphKeys.VARIABLES)
+print(tf.GraphKeys.TRAINABLE_VARIABLES)
+print(tf.GraphKeys.SUMMARIES)
+print(tf.GraphKeys.QUEUE_RUNNERS)
+print(tf.GraphKeys.MOVING_AVERAGE_VARIABLES)
