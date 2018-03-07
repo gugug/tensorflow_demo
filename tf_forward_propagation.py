@@ -13,9 +13,13 @@ w2 = tf.Variable(tf.random_normal([3,1],stddev=1,seed=1))
 input_x = tf.constant([[0.7,0.9]])
 
 sess = tf.Session()
-# 初始化变量
+# 逐一初始化变量
 sess.run(w1.initializer)
 sess.run(w2.initializer)
+
+# 初始化所有变量
+# init_op = tf.initialize_all_variables()
+# sess.run(init_op)
 
 # 前向传播算法计算神经网络的输出
 a = tf.matmul(input_x,w1)
@@ -27,5 +31,7 @@ print(sess.run(input_x))
 
 # 运行输出
 print sess.run(y)
+
+
 
 sess.close()
