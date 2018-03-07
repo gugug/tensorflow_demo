@@ -1,4 +1,4 @@
-#coding=utf-8
+# coding=utf-8
 __author__ = 'gu'
 
 import tensorflow as tf
@@ -9,8 +9,5 @@ b = tf.constant([2.0,3.0],name='b')
 result = a + b
 
 sess = tf.Session()
-
-
-
 
 print sess.run(result)
