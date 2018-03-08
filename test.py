@@ -11,3 +11,5 @@ result = a + b
 sess = tf.Session()
 
 print sess.run(result)
+
+print(1+1<3)
