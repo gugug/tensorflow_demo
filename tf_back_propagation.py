@@ -29,6 +29,12 @@ cross_entropy = -tf.reduce_mean(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
 # 定义学习率
 learning_rate = 0.001
 # 定义反向传播算法来优化神经网络中的参数w1 w2
+"""
+常用的优化算法
+tf.train.AdamOptimizer
+tf.train.GradientDescentOptimizer
+tf.train.MomentumOptimizer
+"""
 train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 
 print(sess.run(train_step, feed_dict={x: [[0.7, 0.9], [0.1, 0.4], [0.5, 0.8]], y_: []}))
