@@ -29,6 +29,7 @@ ram = RandomState(1)
 dataset_size = 128
 X = ram.rand(dataset_size, 2)
 # print(X)
+# 在这里所有的x1+x2<1的样例都被认为是正样本，而其他为负样本
 Y = [[int(x1 + x2 < 1)] for (x1, x2) in X]
 
 # 创建会话运行程序
