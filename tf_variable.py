@@ -22,11 +22,13 @@ arr_zero = tf.zeros([2,3])
 arr_one = tf.ones(shape=[2,3])
 arr_nine = tf.fill([2,3],9)
 arr_const = tf.constant([1,2,3])
+cons = tf.constant(0.1,shape=[3])
 with tf.Session() as sess:
     print sess.run(arr_zero)
     print sess.run(arr_one)
     print sess.run(arr_nine)
     print sess.run(arr_const)
+    print(sess.run(cons))
 
 # 通过其他变量的初始值来初始化新的变量
 tf.Variable(var_random.initial_value)
