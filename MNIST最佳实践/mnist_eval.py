@@ -38,6 +38,11 @@ def evaluate(mnist):
                     global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
                     accuracy_score = sess.run(accuracy, feed_dict=validate_feed)
                     print("After %s training step(s), validation accuracy = %g" % (global_step, accuracy_score))
+
+                    aws = sess.run(tf.argmax(y,1),feed_dict=validate_feed)
+                    print("the truly answer are %s" % mnist.validation.labels)
+                    print("the evaluate answer are %s" % aws)
+
                 else:
                     print('No checkpoint file found')
                     return
