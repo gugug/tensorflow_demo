@@ -1,3 +1,8 @@
+# coding=utf-8
+"""
+定义看前向传播的过程以及神经网络中的参数
+"""
+
 import tensorflow as tf
 
 INPUT_NODE = 784

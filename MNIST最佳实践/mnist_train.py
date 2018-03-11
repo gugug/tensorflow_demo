@@ -1,4 +1,8 @@
 # coding=utf-8
+"""
+定义了神经网络的训练过程
+"""
+
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import mnist_inference
