@@ -39,7 +39,7 @@ def evaluate(mnist):
                     accuracy_score = sess.run(accuracy, feed_dict=validate_feed)
                     print("After %s training step(s), validation accuracy = %g" % (global_step, accuracy_score))
 
-                    aws = sess.run(tf.argmax(y,1),feed_dict=validate_feed)
+                    aws = sess.run(tf.argmax(y, 1), feed_dict=validate_feed)
                     print("the truly answer are %s" % mnist.validation.labels)
                     print("the evaluate answer are %s" % aws)
 
