@@ -41,7 +41,9 @@ def evaluate(mnist):
 
                     aws = sess.run(tf.argmax(y, 1), feed_dict=validate_feed)
                     print("the truly answer are %s" % mnist.validation.labels)
+                    aws1 = sess.run(y, feed_dict=validate_feed)
                     print("the evaluate answer are %s" % aws)
+                    print("the evaluate answer1 are %s" % aws1)
 
                 else:
                     print('No checkpoint file found')

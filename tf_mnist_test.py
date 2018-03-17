@@ -29,5 +29,5 @@ print(mnist.train.labels)
 
 batch_size = 100
 xs, ys = mnist.train.next_batch(batch_size)
-print(tf.argmax(xs, 1))
-print(ys)
+print(xs.shape)  # (100, 784)
+print(ys.shape)  # (100,)

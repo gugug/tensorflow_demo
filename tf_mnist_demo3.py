@@ -69,7 +69,7 @@ def train(mnist):
     # 计算在当前参数下神经网络前向传播的结果，滑动平均类为None
     y = inference(x, None, weights1, biases1, weights2, biases2)
 
-    # 定义存储训练轮数的便利那个。这个变量不需要计算滑动平均值，所以这里指定这个变量为不可寻那脸的变量
+    # 定义存储训练轮数的便利那个。这个变量不需要计算滑动平均值，所以这里指定这个变量为不可训练的变量
     global_step = tf.Variable(0, trainable=False)
 
     # 初始化滑动平均类
