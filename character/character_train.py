@@ -21,7 +21,7 @@ MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
 MODEL_SAVE_PATH = "character_model/"
 MODEL_NAME = "character_model"
 
-train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label()
+train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label('')
 TRAIN_NUM_EXAMPLES = DATASET_SIZE = len(train_list_side)  # 训练数据的总数
 
 # 2. 定义训练过程。
@@ -49,6 +49,7 @@ def train(character):
     # 计算交叉熵作为刻画预测值和真实值之间茶军的损失函数
     """
     // 参考损失函数的计算 http://blog.csdn.net/u013250416/article/details/78230464
+    sigmoid_cross_entropy_with_logits  应用于多标签或者二分类
     """
     # 多目标损失函数
     cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits=y, targets=y_)
