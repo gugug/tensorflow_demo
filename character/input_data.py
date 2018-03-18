@@ -5,8 +5,7 @@ import os
 import numpy as np
 
 
-def load_data_label():
-    base_model_dir = ''
+def load_data_label(base_model_dir):
     train_vec_filename = os.path.join(base_model_dir, "doc2vec_train_vec_dm.npy")
     train_label_filename = os.path.join(base_model_dir, 'doc2vec_train_label_dm.npy')
     test_vec_filename = os.path.join(base_model_dir, 'doc2vec_test_vec_dm.npy')
@@ -24,4 +23,4 @@ def load_data_label():
 
 
 if __name__ == '__main__':
-    load_data_label()
+    load_data_label('')
