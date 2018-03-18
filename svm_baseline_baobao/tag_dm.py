@@ -102,11 +102,13 @@ class user_predict:
         :param doc_name:
         :return:
         """
-        f2 = codecs.open("doc2vec_" + doc_name + ".txt", "w+")
-        for i in X_sp:
-            f2.write(str(i))
-            f2.write("\n")
+        # f2 = codecs.open("doc2vec_" + doc_name + ".txt", "w+")
+        # for i in X_sp:
+        #     f2.write(str(i))
+        #     f2.write("\n")
+        np.save("doc2vec_" + doc_name + ".npy",X_sp)
         print "*****************write done over *****************"
+
 
     def train_lsi(self, doc, str_vec):
 
@@ -131,7 +133,6 @@ class user_predict:
 
         self.write_d2v(list_side, str_vec)
         print " doc2vec 矩阵构建完成----------------"
-
         return list_total, list_tag, list_side
 
     # ------------------------my mean count------------------

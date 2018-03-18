@@ -108,6 +108,9 @@ class user_predict:
         for i in X_sp:
             f2.write(str(i))
             f2.write("\n")
+
+        np.save("doc2vec_" + doc_name + ".npy",X_sp)
+
         print "*****************write done over *****************"
 
     def train_lsi(self, doc, str_vec):
