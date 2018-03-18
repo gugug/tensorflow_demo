@@ -7,8 +7,7 @@ import tensorflow as tf
 import character
 import character_inference
 import os
-import doc2vec_action
-from doc2vec_action import D2vAction
+import input_data
 
 
 # 1. 定义神经网络结构相关的参数。
@@ -22,7 +21,7 @@ MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
 MODEL_SAVE_PATH = "character_model/"
 MODEL_NAME = "character_model"
 
-train_list_side, train_list_tag, text_list_side, text_list_tag = doc2vec_action.load_data_label()
+train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label()
 TRAIN_NUM_EXAMPLES = DATASET_SIZE = len(train_list_side)  # 训练数据的总数
 
 # 2. 定义训练过程。
