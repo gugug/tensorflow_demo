@@ -22,5 +22,8 @@ def load_data_label(base_model_dir):
     return X_train, Y_train, X_test, Y_test
 
 
-if __name__ == '__main__':
-    load_data_label('')
+# if __name__ == '__main__':
+    # X_train, Y_train, X_test, Y_test = load_data_label('')
+    # print(X_test)
+    # print(Y_test[:, 0])  # 取第i列
+    # print np.where(X_test > 0, 1, 0)  # 对每一个元素判断 大于0为1,否则为0
