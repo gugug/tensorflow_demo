@@ -118,6 +118,8 @@ class D2vAction:
         # 将输入解释为矩阵。
         train_list_side = mat(train_list_side)
         text_list_side = mat(text_list_side)
+        # train_list_tag = mat(train_list_tag, dtype=float)
+        # text_list_tag = mat(text_list_tag, dtype=float)
 
         X_train = train_list_side[:TR]
         y_train = train_list_tag[:TR]
@@ -130,18 +132,44 @@ class D2vAction:
         y_text = np.array(y_text)
         print "text shape :---------------------"
         print X_text.shape
-        # print(train_list_side)
-        # print(train_list_tag)
-        # print(text_list_side)
-        # print(text_list_tag)
+        print(train_list_side)
+        print(train_list_tag)
+        print(text_list_side)
+        print(text_list_tag)
 
         return train_list_side, train_list_tag, text_list_side, text_list_tag
 
+    def write_d2v(self, filename, X_sp):
+        """
+        doc2vec的特征向量保存
+        :param X_sp:
+        :param doc_name:
+        :return:
+        """
+        np.save(filename, X_sp)
+        print "*****************write done over *****************"
 
-if __name__ == '__main__':
+
+def load_data_label():
+    """
+    加载训练数据
+    :return:
+    """
     base_dir = '/home/gu/PycharmProjects/tensorflow_demo/essay_data'
     base_model_dir = '/home/gu/PycharmProjects/tensorflow_demo/svm_baseline_baobao'
     d2vAction = D2vAction(base_model_dir,
-                             os.path.join(base_dir, "vocab1_train.txt"),
-                             os.path.join(base_dir, "vocab1_test.txt"))
-    d2vAction.get_d2v_feature()
+                          os.path.join(base_dir, "vocab1_train.txt"),
+                          os.path.join(base_dir, "vocab1_test.txt"))
+    train_list_side, train_list_tag, text_list_side, text_list_tag = d2vAction.get_d2v_feature()
+    str1 = "doc2vec_train_vec_dm.npy"
+    str1_1 = "doc2vec_train_label_dm.npy"
+    str2 = "doc2vec_test_vec_dm.npy"
+    str2_2 = "doc2vec_test_label_dm.npy"
+    d2vAction.write_d2v(str1, np.array(train_list_side))
+    d2vAction.write_d2v(str1_1, np.array(train_list_tag))
+    d2vAction.write_d2v(str2, np.array(text_list_side))
+    d2vAction.write_d2v(str2_2, np.array(text_list_tag))
+
+
+# if __name__ == '__main__':
+#     load_data_label()
