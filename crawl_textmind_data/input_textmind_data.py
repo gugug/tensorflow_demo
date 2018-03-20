@@ -1,0 +1,59 @@
+# coding=utf-8
+"""读取文件"""
+import os
+
+from tensorflow.python.platform import gfile
+
+__author__ = 'gu'
+
+import numpy as np
+
+
+def load_corpus():
+    """
+    加载训练数据
+    :return:
+    """
+    base_dir = '/home/gu/PycharmProjects/tensorflow_demo/essay_data'
+
+    train_txt_path = os.path.join(base_dir, "vocab1_train.txt")
+    test_txt_path = os.path.join(base_dir, "vocab1_test.txt")
+
+    return read_lines(train_txt_path), read_lines(test_txt_path)
+
+
+def read_lines(train_txt_path):
+    with gfile.Open(train_txt_path, 'rb') as f:
+        lines = f.readlines()
+        for line in lines:
+            print(line)
+        print('txt lines length', len(lines))
+        return lines
+
+
+def load_textmind_data_label(base_model_dir):
+    textmind_train_vec = "textmind_train_vec_dm.npy"
+    textmind_train_label = "textmind_train_label_dm.npy"
+    textmind_test_vec = "textmind_test_vec_dm.npy"
+    textmind_test_label = "textmind_test_label_dm.npy"
+
+    train_vec_filename = os.path.join(base_model_dir, textmind_train_vec)
+    train_label_filename = os.path.join(base_model_dir, textmind_train_label)
+    test_vec_filename = os.path.join(base_model_dir, textmind_test_vec)
+    test_label_filename = os.path.join(base_model_dir, textmind_test_label)
+
+    X_train = np.load(train_vec_filename)
+    print('X_train', X_train.shape)
+    Y_train = np.load(train_label_filename)
+    print('Y_train', Y_train.shape)
+    X_test = np.load(test_vec_filename)
+    print('X_test', X_test.shape)
+    Y_test = np.load(test_label_filename)
+    print('Y_test', Y_test.shape)
+    return X_train, Y_train, X_test, Y_test
+
+
+if __name__ == '__main__':
+    X_train, Y_train, X_test, Y_test = load_textmind_data_label('')
+    print(X_test)
+    print(Y_test)
