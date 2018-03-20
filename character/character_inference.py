@@ -6,7 +6,7 @@
 import tensorflow as tf
 
 # 神经网络相关参数
-INPUT_NODE = 200  # 用户的特征维度
+INPUT_NODE = 300  # 用户的特征维度
 OUTPUT_NODE = 5  # 输出5个类别的性格
 LAYER1_NODE = 500  # 隱藏层的节点数
 
