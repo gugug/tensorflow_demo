@@ -89,7 +89,7 @@ class user_predict:
 
         X_doc, list_total, list_tag = self.prepare_lsi(doc)
         # 训练模型
-        model_dm = Doc2Vec(X_doc, dm=1, size=200, negative=5, hs=0, min_count=5, window=8, sample=1e-5, workers=4,
+        model_dm = Doc2Vec(X_doc, dm=1, size=300, negative=5, hs=0, min_count=5, window=8, sample=1e-5, workers=4,
                            alpha=0.025, min_alpha=0.025)
         joblib.dump(model_dm, "model_d2v_dm.model")
         print "d2w模型训练完成"
@@ -207,13 +207,8 @@ class user_predict:
         print self.mymean(true_acc, X_text)
 
 
-from crawl_textmind_data import input_textmind_data
 
 if __name__ == '__main__':
     base_dir = '/home/gu/PycharmProjects/tensorflow_demo/essay_data'
     user_predict = user_predict(os.path.join(base_dir, "vocab1_train.txt"), os.path.join(base_dir, "vocab1_test.txt"))
-    # user_predict.predict()
-
-
-    X_train, Y_train, X_test, Y_test = input_textmind_data.load_textmind_data_label('../crawl_textmind_data')
-    user_predict.train_eval(X_train, Y_train, X_test, Y_test)
+    user_predict.predict()

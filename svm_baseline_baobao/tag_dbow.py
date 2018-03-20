@@ -90,7 +90,7 @@ class user_predict:
 
         X_doc, list_total, list_tag = self.prepare_lsi(doc)
         # 训练模型
-        model_dm = Doc2Vec(X_doc, dm=0, size=200, negative=5, hs=0, min_count=1, window=30, sample=1e-5, workers=8,
+        model_dm = Doc2Vec(X_doc, dm=0, size=300, negative=5, hs=0, min_count=1, window=30, sample=1e-5, workers=8,
                            alpha=0.04, min_alpha=0.025)
         joblib.dump(model_dm, "model_d2v_dbow.model")
         print "d2w模型训练完成"
