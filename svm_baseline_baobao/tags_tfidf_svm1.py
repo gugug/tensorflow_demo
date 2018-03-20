@@ -1,17 +1,17 @@
 # -*- coding: UTF-8 -*-
-"""tfidf-lsi-svm stack for character"""
+'''tfidf-lsi-svm stack for gender'''
 
 from __future__ import division
 
+import codecs
+import os
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
-import codecs
 from sklearn.externals import joblib
-
 from numpy import *
 from gensim import models, corpora
 import numpy as np
-import os
 
 
 class user_predict:
@@ -35,31 +35,31 @@ class user_predict:
     # -----------------------load data-----------------------
     def load_data(self, doc):
 
-        list_name = []  # id
-        list_total = []  # 文本
-        list_label = []  # 标签
+        list_name = []
+        list_total = []
+        list_gender = []
         # 对应标签导入词典
         f = codecs.open(doc)
         temp = f.readlines()
-        f.close()
         print len(temp)
 
         for i in range(len(temp)):
             temp[i] = temp[i].split(" ")
             user_name = temp[i][0]
             tags = temp[i][1:6]
+
             query = temp[i][6:]
             query = " ".join(query).strip().replace("\n", "")
+            # qu biao dian
             # query = re.sub("[+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+".decode("utf8"), "".decode("utf8"),query)
 
             list_total.append(query)
-            list_label.append(tags)
+            list_gender.append(tags)
 
         print list_total.__len__()
-        print list_label.__len__()
-        # 字符串标签转化为int类型
+        print list_gender.__len__()
         list_tag = []
-        for line in list_label:
+        for line in list_gender:
             list_t = []
             for j in line:
                 j = int(j)
@@ -72,11 +72,12 @@ class user_predict:
     # -------------------------prepare lsi svd -----------------------
     def prepare_lsi(self, doc):
 
-        # 给训练集用的，返回文本和对应的标签
+        # 给训练集用的
         list_total, list_tag = self.load_data(doc)
 
         stop_word = []
-        texts = [[word for word in document.lower().split()]
+
+        texts = [[word for word in document.lower().split() if word not in stop_word]
                  for document in list_total]
 
         # train dictionary done
@@ -101,7 +102,7 @@ class user_predict:
 
         return tfidf_model, dictionary
 
-    def train_lsi(self, doc):
+    def train_lsi(self, doc, str_doc):
 
         if not (os.path.exists("tfidf_model.model")):
 
@@ -146,6 +147,8 @@ class user_predict:
                 list_d.append(nodes[i][j][1])
             list_side.append(list_d)
 
+        list_vec = mat(list_side)
+        self.write_d2v(list_vec, str_doc)
         print "lsi 矩阵构建完成----------------"
 
         return list_total, list_tag, list_side
@@ -167,11 +170,13 @@ class user_predict:
 
     # ------------------------------begin to predict------------
     def predict(self):
+        str1 = "train_vec_tfidf"
+        str2 = "test_vec_tfidf"
 
-        train_list_total, train_list_tag, train_list_side = self.train_lsi(self.train_document)
+        train_list_total, train_list_tag, train_list_side = self.train_lsi(self.train_document, str1)
         print "train model done -------------------"
 
-        text_list_total, text_list_tag, text_list_side = self.train_lsi(self.text_document)
+        text_list_total, text_list_tag, text_list_side = self.train_lsi(self.text_document, str2)
         print "text model done  -------------------"
 
         TR = train_list_total.__len__()
@@ -232,7 +237,7 @@ class user_predict:
         print "true acc numbers: " + str(true_acc)
 
         print "LSI + 支持向量机　准确率平均值为: "
-        print self.mymean(true_acc, X_text)
+        print  self.mymean(true_acc, X_text)
 
 
 if __name__ == '__main__':
