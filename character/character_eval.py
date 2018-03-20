@@ -11,6 +11,7 @@ import tensorflow as tf
 import character_inference
 import numpy as np
 import input_data
+from crawl_textmind_data import input_textmind_data
 
 MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
 MODEL_SAVE_PATH = "character_model/"
@@ -18,8 +19,15 @@ MODEL_NAME = "character_model"
 
 # 加载的时间间隔。
 EVAL_INTERVAL_SECS = 5
-train_list_side, train_list_tag, test_list_side, test_list_tag = input_data.load_data_label('')
 
+
+# 加载d2v 和 tfidf的数据
+train_list_side, train_list_tag, test_list_side, test_list_tag = input_data.load_data_label('')
+# 加载textmind的特征
+# train_list_side, train_list_tag, test_list_side, test_list_tag = input_textmind_data.load_textmind_data_label('../crawl_textmind_data')
+
+# 加载整合后的特征
+# train_list_side, train_list_tag, test_list_side, test_list_tag = input_data.load_data_label_combine()
 
 def evaluate(character):
     with tf.Graph().as_default() as g:
