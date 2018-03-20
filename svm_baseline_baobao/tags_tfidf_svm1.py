@@ -202,8 +202,10 @@ class user_predict:
 
         # kfold折叠交叉验证
         list_myAcc = []
-        true_acc = 0
+        self.train_eval(X_train, y_train, X_text, y_text)
 
+    def train_eval(self, X_train, y_train, X_text, y_text):
+        true_acc = 0
         for i in range(5):
             list_train_tags = []
             list_test_tags = []
@@ -220,7 +222,6 @@ class user_predict:
             clf = svm.SVC(probability=True)
 
             clf = svm.SVC(kernel='linear', probability=True)
-
             # 逻辑回归训练模型
             clf.fit(X_train, list_train_tags)
             # 用模型预测
@@ -233,9 +234,7 @@ class user_predict:
             # #获取准确的个数
             print self.myAcc(list_test_tags, y_pred_te)
             true_acc += self.myAcc(list_test_tags, y_pred_te)
-
         print "true acc numbers: " + str(true_acc)
-
         print "LSI + 支持向量机　准确率平均值为: "
         print  self.mymean(true_acc, X_text)
 
