@@ -4,12 +4,13 @@
 from __future__ import division
 
 import codecs
+import os
+
 from sklearn import svm
 from sklearn.externals import joblib
 import gensim
 from numpy import *
 from gensim.models.doc2vec import Doc2Vec, LabeledSentence
-import os
 import numpy as np
 
 
@@ -88,7 +89,7 @@ class user_predict:
 
         X_doc, list_total, list_tag = self.prepare_lsi(doc)
         # 训练模型
-        model_dm = Doc2Vec(X_doc, dm=1, size=300, negative=5, hs=0, min_count=5, window=8, sample=1e-5, workers=4,
+        model_dm = Doc2Vec(X_doc, dm=1, size=200, negative=5, hs=0, min_count=5, window=8, sample=1e-5, workers=4,
                            alpha=0.025, min_alpha=0.025)
         joblib.dump(model_dm, "model_d2v_dm.model")
         print "d2w模型训练完成"
@@ -106,19 +107,14 @@ class user_predict:
         # for i in X_sp:
         #     f2.write(str(i))
         #     f2.write("\n")
-        np.save("doc2vec_" + doc_name + ".npy",X_sp)
+        np.save("doc2vec_" + doc_name + ".npy", X_sp)
         print "*****************write done over *****************"
 
-
     def train_lsi(self, doc, str_vec):
-
         if os.path.exists("model_d2v_dm.model"):
-            # load train model
             model_dm = joblib.load("model_d2v_dm.model")
         else:
-            # load train model
             model_dm = self.train_lsi_model(doc)
-
         # prepare data
         X_doc, list_total, list_tag = self.prepare_lsi(doc)
 
@@ -128,15 +124,12 @@ class user_predict:
             X_d2v = np.array([model_dm.docvecs[i] for i in range(len(list_total))])
 
         print X_d2v.shape
-
         list_side = X_d2v
-
         self.write_d2v(list_side, str_vec)
         print " doc2vec 矩阵构建完成----------------"
         return list_total, list_tag, list_side
 
     # ------------------------my mean count------------------
-
     def mymean(self, list_predict_score, array_test):
         num_total = 0
         num_total = array_test.shape[0] * 5
@@ -174,47 +167,53 @@ class user_predict:
         print "text shape :---------------------"
         print X_text.shape
 
-        # kfold折叠交叉验证
         list_myAcc = []
-        true_acc = 0
+        self.train_eval(X_train, y_train, X_text, y_text)
 
+    def train_eval(self, X_train, y_train, X_text, y_text):
+        """
+        输入矩阵 训练模型并计算准确率
+        :param X_text:
+        :param X_train:
+        :param y_text:
+        :param y_train:
+        :return:
+        """
+        true_acc = 0
         for i in range(5):
             list_train_tags = []
             list_test_tags = []
             print "第" + str(i) + "个分类器训练"
-
             # first build train tag
             for line in y_train:
                 list_train_tags.append(line[i])
-
             # first build text tag
             for line in y_text:
                 list_test_tags.append(line[i])
-
             clf = svm.SVC(probability=True)
-
             clf = svm.SVC(kernel='linear', probability=True)
-
             # 逻辑回归训练模型
             clf.fit(X_train, list_train_tags)
             # 用模型预测
             y_pred_te = clf.predict_proba(X_text)
-
             print np.argmax(y_pred_te, axis=1)
             print "**" * 50
             print list_test_tags
-
             # #获取准确的个数
             print self.myAcc(list_test_tags, y_pred_te)
             true_acc += self.myAcc(list_test_tags, y_pred_te)
-
         print "true acc numbers: " + str(true_acc)
-
         print "d2w_dm + 支持向量机　准确率平均值为: "
         print self.mymean(true_acc, X_text)
 
 
+from crawl_textmind_data import input_textmind_data
+
 if __name__ == '__main__':
     base_dir = '/home/gu/PycharmProjects/tensorflow_demo/essay_data'
     user_predict = user_predict(os.path.join(base_dir, "vocab1_train.txt"), os.path.join(base_dir, "vocab1_test.txt"))
-    user_predict.predict()
+    # user_predict.predict()
+
+
+    X_train, Y_train, X_test, Y_test = input_textmind_data.load_textmind_data_label('../crawl_textmind_data')
+    user_predict.train_eval(X_train, Y_train, X_test, Y_test)

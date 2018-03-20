@@ -90,7 +90,7 @@ class user_predict:
 
         X_doc, list_total, list_tag = self.prepare_lsi(doc)
         # 训练模型
-        model_dm = Doc2Vec(X_doc, dm=0, size=300, negative=5, hs=0, min_count=1, window=30, sample=1e-5, workers=8,
+        model_dm = Doc2Vec(X_doc, dm=0, size=200, negative=5, hs=0, min_count=1, window=30, sample=1e-5, workers=8,
                            alpha=0.04, min_alpha=0.025)
         joblib.dump(model_dm, "model_d2v_dbow.model")
         print "d2w模型训练完成"
@@ -104,11 +104,6 @@ class user_predict:
         :param doc_name:
         :return:
         """
-        f2 = codecs.open("doc2vec_" + doc_name + ".txt", "w+")
-        for i in X_sp:
-            f2.write(str(i))
-            f2.write("\n")
-
         np.save("doc2vec_" + doc_name + ".npy",X_sp)
 
         print "*****************write done over *****************"
