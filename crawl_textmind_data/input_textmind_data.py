@@ -32,6 +32,11 @@ def read_lines(train_txt_path):
 
 
 def load_textmind_data_label(base_model_dir):
+    """
+    加载textmind矩阵
+    :param base_model_dir:
+    :return:
+    """
     textmind_train_vec = "textmind_train_vec_dm.npy"
     textmind_train_label = "textmind_train_label_dm.npy"
     textmind_test_vec = "textmind_test_vec_dm.npy"
@@ -53,7 +58,36 @@ def load_textmind_data_label(base_model_dir):
     return X_train, Y_train, X_test, Y_test
 
 
+def load_textmind_data_label_with_normalization(base_model_dir):
+    """
+    加载textmind矩阵 并进行数据平滑
+    :param base_model_dir:
+    :return:
+    """
+    textmind_train_vec = "textmind_train_vec_dm.npy"
+    textmind_train_label = "textmind_train_label_dm.npy"
+    textmind_test_vec = "textmind_test_vec_dm.npy"
+    textmind_test_label = "textmind_test_label_dm.npy"
+
+    train_vec_filename = os.path.join(base_model_dir, textmind_train_vec)
+    train_label_filename = os.path.join(base_model_dir, textmind_train_label)
+    test_vec_filename = os.path.join(base_model_dir, textmind_test_vec)
+    test_label_filename = os.path.join(base_model_dir, textmind_test_label)
+
+    X_train = np.load(train_vec_filename)
+    print('X_train', X_train.shape)
+    Y_train = np.load(train_label_filename)
+    print('Y_train', Y_train.shape)
+    X_test = np.load(test_vec_filename)
+    print('X_test', X_test.shape)
+    Y_test = np.load(test_label_filename)
+    print('Y_test', Y_test.shape)
+    X_train_1 = np.where(X_train >= 0, np.log(X_train + 1), 0)
+    X_test_1 = np.where(X_test >= 0, np.log(X_test + 1), 0)
+    return X_train_1, Y_train, X_test_1, Y_test
+
+
 if __name__ == '__main__':
-    X_train, Y_train, X_test, Y_test = load_textmind_data_label('')
+    X_train, Y_train, X_test, Y_test = load_textmind_data_label_with_normalization('')
     print(X_test)
     print(Y_test)
