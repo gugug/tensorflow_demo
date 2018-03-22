@@ -80,9 +80,11 @@ class SVMCharacterPredict:
         svm 文心特征
         :return:
         """
-        X_train, Y_train, X_test, Y_test = input_textmind_data.load_textmind_data_label('../crawl_textmind_data')
+        X_train, Y_train, X_test, Y_test = input_textmind_data.load_textmind_data_label_with_normalization(
+            '../crawl_textmind_data')
         mymean = self.train_eval(X_train, Y_train, X_test, Y_test)
         print "textmind+支持向量机　准确率平均值为: " + str(mymean)
+        return X_train, Y_train, X_test, Y_test
 
     def predict_by_d2v_dm(self):
         """
@@ -99,6 +101,7 @@ class SVMCharacterPredict:
                                                          train_vec_filename)
         mymean = self.train_eval(X_train, Y_train, X_test, Y_test)
         print "d2v_dm+支持向量机　准确率平均值为: " + str(mymean)
+        return X_train, Y_train, X_test, Y_test
 
     def predict_by_d2v_dbow(self):
         """
@@ -115,6 +118,7 @@ class SVMCharacterPredict:
                                                          train_vec_filename)
         mymean = self.train_eval(X_train, Y_train, X_test, Y_test)
         print "d2v_dbow+支持向量机　准确率平均值为: " + str(mymean)
+        return X_train, Y_train, X_test, Y_test
 
     def predict_by_tfidf(self):
         """
@@ -122,15 +126,29 @@ class SVMCharacterPredict:
         :return:
         """
         base_model_dir = ''
-        train_vec_filename = os.path.join(base_model_dir, "../character/tfidf_train_vec_tfidf.npy")
+        train_vec_filename = os.path.join(base_model_dir, "tfidf_train_vec_tfidf.npy")
         train_label_filename = os.path.join(base_model_dir, 'doc2vec_train_label_dm.npy')
-        test_vec_filename = os.path.join(base_model_dir, '../character/tfidf_test_vec_tfidf.npy')
+        test_vec_filename = os.path.join(base_model_dir, 'tfidf_test_vec_tfidf.npy')
         test_label_filename = os.path.join(base_model_dir, 'doc2vec_test_label_dm.npy')
 
         X_train, Y_train, X_test, Y_test = self.load_arr(test_label_filename, test_vec_filename, train_label_filename,
                                                          train_vec_filename)
         mymean = self.train_eval(X_train, Y_train, X_test, Y_test)
         print "tfidf+支持向量机　准确率平均值为: " + str(mymean)
+        return X_train, Y_train, X_test, Y_test
+
+    def predict_by_combine(self):
+        """
+        组合特征训练
+        :return:
+        """
+        from character import input_data
+
+        X_train, Y_train, X_test, Y_test = self.predict_by_d2v_dbow()
+        X1_train, Y1_train, X1_test, Y1_test = self.predict_by_emotion()
+        train_list_side, text_list_side = input_data.load_data_label_combine(X_train, X_test, X1_train, X1_test)
+        mymean = self.train_eval(train_list_side, Y_train, text_list_side, Y_test)
+        print "综合特征+支持向量机　准确率平均值为: " + str(mymean)
 
     def load_arr(self, test_label_filename, test_vec_filename, train_label_filename, train_vec_filename):
         X_train = np.load(train_vec_filename)
@@ -143,12 +161,21 @@ class SVMCharacterPredict:
         print('Y_test', Y_test.shape)
         return X_train, Y_train, X_test, Y_test
 
+    def predict_by_emotion(self):
+        """
+        情感特征
+        :return:
+        """
+        from Emotion_Lexicon import data_helper
+
+        X_train, Y_train, X_test, Y_test = data_helper.load_emotion_data_label('../Emotion_Lexicon')
+        mymean = self.train_eval(X_train, Y_train, X_test, Y_test)
+        print "情感特征+支持向量机　准确率平均值为: " + str(mymean)
+        return X_train, Y_train, X_test, Y_test
+
 
 from crawl_textmind_data import input_textmind_data
 
 if __name__ == '__main__':
     user_predict = SVMCharacterPredict()
-    user_predict.predict_by_d2v_dbow()
-    user_predict.predict_by_d2v_dm()
-    user_predict.predict_by_tfidf()
-    # user_predict.predict_by_textmind()
+    user_predict.predict_by_combine()
