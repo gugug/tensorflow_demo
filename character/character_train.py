@@ -9,25 +9,34 @@ import character_inference
 import os
 import input_data
 from crawl_textmind_data import input_textmind_data
-
+from Emotion_Lexicon import data_helper
 
 # 1. 定义神经网络结构相关的参数。
-LAYER1_NODE = 500  # 隱藏层节点数，这里使用只有一层隱藏层的网络结构500个节点
 BATCH_SIZE = 50  # 一个训练batch中的训练数据个数，数字越小，训练过程越接近随机梯度下降
 LEARNING_RATE_BASE = 0.8  # 基础的学习率
 LEARNING_RATE_DECAY = 0.99  # 学习率衰减率
 REGULARIZATION_RATE = 0.0001  # 描述模型复杂度的正则化在损失函数的系数
 TRAINING_STEPS = 30000  # 训练轮数
 MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
-MODEL_SAVE_PATH = "character_model/"
+MODEL_SAVE_PATH = "character_model/dbow+tfidf/"
 MODEL_NAME = "character_model"
 
 # 加载d2v 和 tfidf的数据
 train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label('')
-# # 加载textmind的特征
-# train_list_side, train_list_tag, text_list_side, text_list_tag = input_textmind_data.load_textmind_data_label('../crawl_textmind_data')
-# # 加载整合后的特征
-# train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label_combine()
+train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.load_data_label1('')
+
+#  加载textmind的特征
+# train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = \
+#     input_textmind_data.load_textmind_data_label_with_normalization('../crawl_textmind_data')
+
+# # 加载情感的特征
+# train_list_side, train_list_tag, text_list_side, text_list_tag = \
+#     data_helper.load_emotion_data_label('../Emotion_Lexicon')
+
+# 整合特征
+train_list_side, text_list_side = input_data. \
+    load_data_label_combine(X_train=train_list_side, X_test=text_list_side, X1_train=train_list_side1,
+                            X1_test=text_list_side1)
 
 TRAIN_NUM_EXAMPLES = DATASET_SIZE = len(train_list_side)  # 训练数据的总数
 
@@ -42,7 +51,7 @@ def train(character):
 
     # 计算在当前参数下神经网络前向传播的结果
     y = character_inference.inference(x, regularizer)
-
+    # y = character_inference.inference_nlayer(x,regularizer)
     # 定义存储训练轮数的便利那个。这个变量不需要计算滑动平均值，所以这里指定这个变量为不可训练的变量
     global_step = tf.Variable(0, trainable=False)
 
@@ -85,12 +94,17 @@ def train(character):
 
         for i in range(TRAINING_STEPS):
 
-            # 每次选取batch_size样本进行训练
-            start = (i * BATCH_SIZE) % DATASET_SIZE
-            end = min(start + BATCH_SIZE, DATASET_SIZE)
+            # # 每次选取batch_size样本进行训练
+            # start = (i * BATCH_SIZE) % DATASET_SIZE
+            # end = min(start + BATCH_SIZE, DATASET_SIZE)
+            # _, loss_value, step = sess.run([train_op, loss, global_step],
+            #                                feed_dict={x: train_list_side[start:end],
+            #                                           y_: train_list_tag[start:end]})
+
+            # 每次选取all_size样本进行训练
             _, loss_value, step = sess.run([train_op, loss, global_step],
-                                           feed_dict={x: train_list_side[start:end],
-                                                      y_: train_list_tag[start:end]})
+                                           feed_dict={x: train_list_side,
+                                                      y_: train_list_tag})
             if i % 1000 == 0:
                 print("After %d training step(s), loss on training batch is %g." % (step, loss_value))
                 saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=global_step)
