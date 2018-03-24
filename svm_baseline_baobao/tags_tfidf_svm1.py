@@ -13,6 +13,8 @@ from numpy import *
 from gensim import models, corpora
 import numpy as np
 
+INPUT_SIZE = 300  # 训练特征维度参数
+
 
 class user_predict:
     def __init__(self, train_document, text_document):
@@ -69,13 +71,36 @@ class user_predict:
         print "data have read "
         return list_total, list_tag
 
+    def load_stopword(self):
+        """
+        加载停用词语
+        :param stopworddoc:
+        :return:
+        """
+        stop_word = []
+        return stop_word
+        # with open('EN_Stopword.txt') as f:
+        #     lines = f.readlines()
+        #     for line in lines:
+        #         word = line.replace('\n', '')
+        #         if word != '':
+        #             stop_word.append(word)
+        # with open('ENstopwords.txt') as f:
+        #     lines = f.readlines()
+        #     for line in lines:
+        #         word = line.replace('\n', '')
+        #         if word != '':
+        #             stop_word.append(word)
+        #
+        # return list(set(stop_word))
+
     # -------------------------prepare lsi svd -----------------------
     def prepare_lsi(self, doc):
 
         # 给训练集用的
         list_total, list_tag = self.load_data(doc)
 
-        stop_word = []
+        stop_word = self.load_stopword()
 
         texts = [[word for word in document.lower().split() if word not in stop_word]
                  for document in list_total]
@@ -94,7 +119,7 @@ class user_predict:
 
         corpus_tfidf = tfidf_model[corpus]
 
-        lsi_model = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=200)
+        lsi_model = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=INPUT_SIZE)
 
         joblib.dump(dictionary, "tfidf_dictionary.dict")
         print "训练集lsi -----"
@@ -103,19 +128,15 @@ class user_predict:
         return tfidf_model, dictionary
 
     def train_lsi(self, doc, str_doc):
-
         if not (os.path.exists("tfidf_model.model")):
-
             print "prepare model"
             # load train model
             tfidf_model, dictionary = self.prepare_lsi(doc)
-
             # load data
             list_total, list_tag = self.load_data(doc)
-            stop_word = []
+            stop_word = self.load_stopword()
             texts = [[word for word in document.lower().split() if word not in stop_word]
                      for document in list_total]
-
             corpus = [dictionary.doc2bow(text) for text in texts]
 
         else:
@@ -123,26 +144,21 @@ class user_predict:
             # load train valid text
             tfidf_model = joblib.load("tfidf_model.model")
             dictionary = joblib.load("tfidf_dictionary.dict")
-
             # load data
             list_total, list_tag = self.load_data(doc)
-            stop_word = []
+            stop_word = self.load_stopword()
             texts = [[word for word in document.lower().split() if word not in stop_word]
                      for document in list_total]
-
             corpus = [dictionary.doc2bow(text) for text in texts]
-
         lsi_model = joblib.load("tfidf_lsi.model")
         corpus_tfidf = tfidf_model[corpus]
-
         list_side = []
-
         corpus_lsi = lsi_model[corpus_tfidf]
         nodes = list(corpus_lsi)
 
         for i in range(len(nodes)):
             list_d = []
-            for j in range(200):
+            for j in range(INPUT_SIZE):
                 # print nodes[i][j]
                 list_d.append(nodes[i][j][1])
             list_side.append(list_d)
@@ -150,14 +166,11 @@ class user_predict:
         list_vec = mat(list_side)
         self.write_d2v(list_vec, str_doc)
         print "lsi 矩阵构建完成----------------"
-
         return list_total, list_tag, list_side
 
     # -----------------------write vec--------------------
     def write_d2v(self, X_sp, doc_name):
-
         file_name = "tfidf_" + doc_name + ".npy"
-
         np.save(file_name, X_sp)
         print "*****************write done over *****************"
 
@@ -172,20 +185,15 @@ class user_predict:
     def predict(self):
         str1 = "train_vec_tfidf"
         str2 = "test_vec_tfidf"
-
         train_list_total, train_list_tag, train_list_side = self.train_lsi(self.train_document, str1)
         print "train model done -------------------"
-
         text_list_total, text_list_tag, text_list_side = self.train_lsi(self.text_document, str2)
         print "text model done  -------------------"
-
         TR = train_list_total.__len__()
         TE = text_list_total.__len__()
         n = 5
-
         train_list_side = mat(train_list_side)
         text_list_side = mat(text_list_side)
-
         X_train = train_list_side[:TR]
         y_train = train_list_tag[:TR]
         y_train = np.array(y_train)
@@ -240,6 +248,10 @@ class user_predict:
 
 
 if __name__ == '__main__':
+
     base_dir = '/home/gu/PycharmProjects/tensorflow_demo/essay_data'
-    user_predict = user_predict(os.path.join(base_dir, "vocab1_train.txt"), os.path.join(base_dir, "vocab1_test.txt"))
+    user_predict = user_predict(os.path.join(base_dir, "vocab1_train.txt"),
+                                os.path.join(base_dir, "vocab1_test.txt"))
+    # for _ in range(9):
+        # print('训练次数', _)
     user_predict.predict()
