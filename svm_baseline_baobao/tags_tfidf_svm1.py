@@ -105,22 +105,25 @@ class user_predict:
         texts = [[word for word in document.lower().split() if word not in stop_word]
                  for document in list_total]
 
-        # train dictionary done
+        # train dictionary done# 抽取一个bag-of-words，将文档的token映射为id
         dictionary = corpora.Dictionary(texts)  # 生成词典
         # print dictionary.token2id
+        # 产生文档向量，将用字符串表示的文档转换为用id和词频表示的文档向量
+        corpus = [dictionary.doc2bow(text) for text in texts]
+
         # 用TFIDF的方法计算词频,sublinear_tf 表示学习率
         tfv = TfidfVectorizer(min_df=1, max_df=0.95, sublinear_tf=True, stop_words=stop_word)
         # 对文本中所有的用户对应的所有的评论里面的单词进行ＴＦＩＤＦ的计算，找出每个词对应的tfidf值
         X_sp = tfv.fit_transform(list_total)
-        corpus = [dictionary.doc2bow(text) for text in texts]
-        # train model done
+        # train model done基于这些“训练文档”计算一个TF-IDF模型
         tfidf_model = models.TfidfModel(corpus)
         joblib.dump(tfidf_model, "tfidf_model.model")
 
+        # 转化文档向量，将用词频表示的文档向量表示为一个用tf-idf值表示的文档向量
         corpus_tfidf = tfidf_model[corpus]
 
+        # 训练LSI模型 即将训练文档向量组成的矩阵SVD分解，并做一个秩为2的近似SVD分解
         lsi_model = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=INPUT_SIZE)
-
         joblib.dump(dictionary, "tfidf_dictionary.dict")
         print "训练集lsi -----"
         joblib.dump(lsi_model, "tfidf_lsi.model")
@@ -248,10 +251,9 @@ class user_predict:
 
 
 if __name__ == '__main__':
-
     base_dir = '/home/gu/PycharmProjects/tensorflow_demo/essay_data'
     user_predict = user_predict(os.path.join(base_dir, "vocab1_train.txt"),
                                 os.path.join(base_dir, "vocab1_test.txt"))
     # for _ in range(9):
-        # print('训练次数', _)
+    # print('训练次数', _)
     user_predict.predict()
