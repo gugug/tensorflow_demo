@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
-"""tfidf-lsi-svm stack for character"""
+"""tfidf-svm stack for character"""
 
 from __future__ import division
 
 import codecs
-import os
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
@@ -64,28 +63,9 @@ class user_predict:
         print "data have read "
         return list_total, list_tag
 
-    # -------------------------prepare lsi svd -----------------------
-    def prepare(self, doc):
-
-        # 给训练集用的，返回文本和对应的标签
-        list_total, list_tag = self.load_data(doc)
-
-        stop_word = []
-        texts = [[word for word in document.lower().split()]
-                 for document in list_total]
-
-        dictionary = corpora.Dictionary(texts)  # 生成词典
-        tfv = TfidfVectorizer(min_df=1, max_df=0.95, sublinear_tf=True, stop_words=stop_word)
-        X_sp = tfv.fit_transform(list_total)
-        corpus = [dictionary.doc2bow(text) for text in texts]
-        tfidf_model = models.TfidfModel(corpus)
-        joblib.dump(tfidf_model, "tfidf_model_notlsi.model")
-        joblib.dump(dictionary, "tfidf_dictionary_notlsi.dict")
-        return tfidf_model, dictionary, X_sp
-
     def train(self, doc):
         list_total, list_tag = self.load_data(doc)
-        tfv = TfidfVectorizer(min_df=1, max_df=0.95, sublinear_tf=True, stop_words=[])
+        tfv = TfidfVectorizer(min_df=1, max_df=0.95, sublinear_tf=True, stop_words=[], max_features=10000)
         X_sp = tfv.fit_transform(list_total)
         print X_sp.shape
         return list_total, list_tag, X_sp
