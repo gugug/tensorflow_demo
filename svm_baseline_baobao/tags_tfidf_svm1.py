@@ -106,10 +106,12 @@ class user_predict:
                  for document in list_total]
 
         # train dictionary done# 抽取一个bag-of-words，将文档的token映射为id
-        dictionary = corpora.Dictionary(texts)  # 生成词典
+        dictionary = corpora.Dictionary(texts)  # 生成词典 # {'a': 0, 'damaged': 1, 'gold': 3, 'fire': 2}
         # print dictionary.token2id
         # 产生文档向量，将用字符串表示的文档转换为用id和词频表示的文档向量
         corpus = [dictionary.doc2bow(text) for text in texts]
+        # [[(0, 1), (6, 1)], [(0, 1), (9, 2), (10, 1)], [(0, 1), (3, 1)]]
+        # 例如（9，2）这个元素代表第二篇文档中id为9的单词出现了2次
 
         # 用TFIDF的方法计算词频,sublinear_tf 表示学习率
         tfv = TfidfVectorizer(min_df=1, max_df=0.95, sublinear_tf=True, stop_words=stop_word)
@@ -121,6 +123,7 @@ class user_predict:
 
         # 转化文档向量，将用词频表示的文档向量表示为一个用tf-idf值表示的文档向量
         corpus_tfidf = tfidf_model[corpus]
+        # [[(1, 0.6633689723434505), (2, 0.6633689723434505)],[(7, 0.16073253746956623), (8, 0.4355066251613605)]]
 
         # 训练LSI模型 即将训练文档向量组成的矩阵SVD分解，并做一个秩为2的近似SVD分解
         lsi_model = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=INPUT_SIZE)
