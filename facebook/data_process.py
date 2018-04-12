@@ -1,5 +1,5 @@
 # coding=utf-8
-
+"""facebook数据的预处理方法"""
 import os
 from collections import defaultdict
 import re
@@ -18,6 +18,7 @@ def readcsv(datafile):
     print('loading csv...')
     print('loading emotion dict...')
     content_dict = defaultdict(float)
+    score_label_dict = defaultdict(float)
     label_dict = defaultdict(float)
     other_vec_dict = defaultdict(float)
     with open(datafile, "rb") as csvf:
@@ -42,13 +43,12 @@ def readcsv(datafile):
             for value in line[7:12]:
                 character_value.append(1 if value == 'y' else 0)
             label_dict[uid] = character_value
-
-            other_list = line[2:7]
-            other_list += line[13:]
+            score_label_dict[uid] = line[2:7]
+            other_list = line[13:]
             other_vec_dict[uid] = other_list
 
     print(len(label_dict), len(content_dict), len(other_vec_dict))
-    return content_dict, label_dict, other_vec_dict
+    return content_dict, score_label_dict, other_vec_dict
 
 
 def load_content(content_dict={}):
@@ -89,7 +89,4 @@ def write_npy(path, X):
 from crawler import Crawler
 
 if __name__ == '__main__':
-    content_dict, label_dict, other_vec_dict = readcsv("./fb_data/mypersonality_final.csv")
-    content_lines = load_content(content_dict)
-    cr = Crawler()
-    cr.textmind_action(content_lines)
+    pass
