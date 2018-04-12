@@ -8,26 +8,29 @@ __author__ = 'gu'
 
 import time
 import tensorflow as tf
+
 import character_inference
 import numpy as np
 import input_data
 
 MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
-MODEL_SAVE_PATH = "character_model/"
+MODEL_SAVE_PATH = "character_model/classfy/"
 MODEL_NAME = "character_model"
 print(MODEL_SAVE_PATH)
-# 加载的时间间隔。
-EVAL_INTERVAL_SECS = 2
+EVAL_INTERVAL_SECS = 5
 
-train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_label()
+train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_classfy_data()
 
 
-def evaluate(character):
+def evaluate():
     with tf.Graph().as_default() as g:
         x = tf.placeholder(tf.float32, [None, character_inference.INPUT_NODE], name='x-input')
-        y_ = tf.placeholder(tf.int64, name='y-input')
-        validate_feed = {x: text_list_side, y_: text_list_tag}
+        y_ = tf.placeholder(tf.float32, name='y-input')
         y = character_inference.inference(x, None)
+        cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits=y, targets=y_)
+        cross_entropy_mean = tf.reduce_mean(cross_entropy)
+        loss = cross_entropy_mean
+
         variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY)
         variables_to_restore = variable_averages.variables_to_restore()
         saver = tf.train.Saver(variables_to_restore)
@@ -39,11 +42,17 @@ def evaluate(character):
 
         while True:
             with tf.Session() as sess:
+                validate_feed = {x: text_list_side, y_: text_list_tag}
                 ckpt = tf.train.get_checkpoint_state(MODEL_SAVE_PATH)
                 if ckpt and ckpt.model_checkpoint_path:
                     saver.restore(sess, ckpt.model_checkpoint_path)
                     global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
                     eval_aws = sess.run(y, feed_dict=validate_feed)
+
+                    print(text_list_tag)
+                    print(eval_aws)
+                    eval_loss = sess.run(loss, feed_dict=validate_feed)
+                    print("After %s training step(s) the evaluate eval_loss are %s" % (global_step, eval_loss))
 
                     accuracy_score, acc_list = get_acc(sess, text_list_tag, eval_aws)
                     print("After %s training step(s), all validation accuracy = %g" % (global_step, accuracy_score))
@@ -67,7 +76,6 @@ def evaluate(character):
                         dict_acc_lsit[global_step] = acc_list
                     if int(global_step) == 29001:
                         # print("================全部准确率===================")
-                        # sort_dict(dict_acc)
                         print("================5个准确率===================")
                         sort_dict(dict_acc_lsit)
                         print("================5个精准率===================")
@@ -124,7 +132,10 @@ def get_precision(true_y, pred_y):
         for i in range(len(true_class1)):
             if true_class1[i] == 1 and pred_class1_[i] == 1:
                 precison += 1
-        precison_list.append(precison * 1.0 / np.sum(pred_class1_))
+        if np.sum(pred_class1_) == 0:
+            precison_list.append(0)
+        else:
+            precison_list.append(precison * 1.0 / np.sum(pred_class1_))
     return precison_list
 
 
@@ -159,7 +170,10 @@ def get_f1(precison_list, recall_list):
     for i in range(5):
         precison = precison_list[i]
         recall = recall_list[i]
-        f1_list.append((2 * precison * recall) / (precison + recall))
+        if precison + recall == 0:
+            f1_list.append(0)
+        else:
+            f1_list.append((2 * precison * recall) / (precison + recall))
     return f1_list
 
 
@@ -190,7 +204,7 @@ def sort_dict(dict):
 
 
 def main(argv=None):
-    evaluate(character)
+    evaluate()
 
 
 if __name__ == '__main__':

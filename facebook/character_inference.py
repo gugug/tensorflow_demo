@@ -7,8 +7,10 @@ import math
 
 import tensorflow as tf
 
-INPUT_NODE = 102  # 用户的特征维度
-OUTPUT_NODE = 5  # 输出5个类别的性格
+INPUT_NODE = 102
+# OUTPUT_NODE = 1 # 线性回归时输出一个结果
+OUTPUT_NODE = 5  # 分类时结果数为分类数
+
 # LAYER1_NODE = 8  # 隱藏层的节点数 根据经验公式lgn
 expr = 0.43 * INPUT_NODE * 5 + 0.12 * 5 * 5 + 2.54 * INPUT_NODE + 0.77 * 5 + 0.35
 LAYER1_NODE = int(math.sqrt(expr) + 0.51)
