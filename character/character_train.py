@@ -13,17 +13,17 @@ from Emotion_Lexicon import data_helper
 
 # 1. 定义神经网络结构相关的参数。
 BATCH_SIZE = 50  # 一个训练batch中的训练数据个数，数字越小，训练过程越接近随机梯度下降
-LEARNING_RATE_BASE = 0.8  # 基础的学习率
+LEARNING_RATE_BASE = 0.01  # 基础的学习率
 LEARNING_RATE_DECAY = 0.99  # 学习率衰减率
 REGULARIZATION_RATE = 0.0001  # 描述模型复杂度的正则化在损失函数的系数
 TRAINING_STEPS = 30000  # 训练轮数
-MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
-MODEL_SAVE_PATH = "character_model/dbow+tfidf/"
+MOVING_AVERAGE_DECAY = 0.99  # 滑动平均衰减率
+MODEL_SAVE_PATH = "character_model/tfidf/"
 MODEL_NAME = "character_model"
 
 # 加载d2v 和 tfidf的数据
 train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label('')
-train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.load_data_label1('')
+# train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.load_data_label1('')
 
 #  加载textmind的特征
 # train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = \
@@ -34,9 +34,9 @@ train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.
 #     data_helper.load_emotion_data_label('../Emotion_Lexicon')
 
 # 整合特征
-train_list_side, text_list_side = input_data. \
-    load_data_label_combine(X_train=train_list_side, X_test=text_list_side, X1_train=train_list_side1,
-                            X1_test=text_list_side1)
+# train_list_side, text_list_side = input_data. \
+#     load_data_label_combine(X_train=train_list_side, X_test=text_list_side, X1_train=train_list_side1,
+#                             X1_test=text_list_side1)
 
 TRAIN_NUM_EXAMPLES = DATASET_SIZE = len(train_list_side)  # 训练数据的总数
 

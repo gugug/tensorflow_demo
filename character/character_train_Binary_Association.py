@@ -104,7 +104,7 @@ def train(character):
             # 每次选取all_size样本进行训练
             _, loss_value, step = sess.run([train_op, loss, global_step],
                                            feed_dict={x: train_list_side,
-                                                      y_: train_list_tag[:, 0]})
+                                                      y_: train_list_tag[:, 1]})
             if i % 1000 == 0:
                 print("After %d training step(s), loss on training batch is %g." % (step, loss_value))
                 saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=global_step)

@@ -42,7 +42,7 @@ def evaluate(character):
     with tf.Graph().as_default() as g:
         x = tf.placeholder(tf.float32, [None, character_inference_Binary_Association.INPUT_NODE], name='x-input')
         y_ = tf.placeholder(tf.int64, name='y-input')
-        validate_feed = {x: text_list_side, y_: text_list_tag[:, 0]}
+        validate_feed = {x: text_list_side, y_: text_list_tag[:, 1]}
 
         y = character_inference_Binary_Association.inference(x, None)
         # y = character_inference_Binary_Association.inference_nlayer(x, None)

@@ -15,7 +15,7 @@ from crawl_textmind_data import input_textmind_data
 from Emotion_Lexicon import data_helper
 
 MOVING_AVERAGE_DECAY = 0.99  # 活动平均衰减率
-MODEL_SAVE_PATH = "character_model/dbow+tfidf/"
+MODEL_SAVE_PATH = "character_model/tfidf/"
 MODEL_NAME = "character_model"
 print(MODEL_SAVE_PATH)
 # 加载的时间间隔。
@@ -23,7 +23,7 @@ EVAL_INTERVAL_SECS = 2
 
 # 加载d2v 和 tfidf的数据
 train_list_side, train_list_tag, text_list_side, text_list_tag = input_data.load_data_label('')
-train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.load_data_label1('')
+# train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.load_data_label1('')
 
 # #  加载textmind的特征
 # train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = \
@@ -34,21 +34,21 @@ train_list_side1, train_list_tag1, text_list_side1, text_list_tag1 = input_data.
 #     data_helper.load_emotion_data_label('../Emotion_Lexicon')
 #
 # # 整合特征
-train_list_side, text_list_side = input_data. \
-    load_data_label_combine(X_train=train_list_side, X_test=text_list_side, X1_train=train_list_side1,
-                            X1_test=text_list_side1)
+# train_list_side, text_list_side = input_data. \
+#     load_data_label_combine(X_train=train_list_side, X_test=text_list_side, X1_train=train_list_side1,
+#                             X1_test=text_list_side1)
 
 def evaluate(character):
     with tf.Graph().as_default() as g:
         x = tf.placeholder(tf.float32, [None, character_inference.INPUT_NODE], name='x-input')
-        y_ = tf.placeholder(tf.int64, name='y-input')
-        validate_feed = {x: text_list_side, y_: text_list_tag}
+        y_ = tf.placeholder(tf.float32, name='y-input')
 
         y = character_inference.inference(x, None)
-        # y = character_inference.inference_nlayer(x, None)
 
-        # correct_prediction = tf.equal(tf.argmax(y, 1), y_)
-        # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        # 训练时损失函数
+        cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits=y, targets=y_)
+        cross_entropy_mean = tf.reduce_mean(cross_entropy)
+        loss = cross_entropy_mean
 
         variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY)
         variables_to_restore = variable_averages.variables_to_restore()
@@ -61,6 +61,7 @@ def evaluate(character):
 
         while True:
             with tf.Session() as sess:
+                validate_feed = {x: text_list_side, y_: text_list_tag}
                 # tf.train.get_checkpoint_state 会根据checkpoint文件自动找到目录中最新模型的文件名
                 ckpt = tf.train.get_checkpoint_state(MODEL_SAVE_PATH)
                 if ckpt and ckpt.model_checkpoint_path:
@@ -74,6 +75,9 @@ def evaluate(character):
                     # print("the input data are \n%s" % test_list_side)
                     # print("the truly answer are \n%s" % test_list_tag)
                     eval_aws = sess.run(y, feed_dict=validate_feed)
+                    eval_loss = sess.run(loss, feed_dict=validate_feed)
+                    print("========the evaluate eval_loss are %s" % eval_loss)
+
                     # print("the evaluate answer are \n%s" % eval_aws)
 
                     accuracy_score, acc_list = get_acc(sess, text_list_tag, eval_aws)
